@@ -69,6 +69,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--sun);outline-of
 .mut{color:var(--muted)}
 [hidden]{display:none!important}
 .stack{display:flex;flex-direction:column;gap:14px}
+.ja{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--ok-soft);color:var(--ok);border-radius:12px;padding:12px 14px;font-size:14px;font-weight:600}
+.ja button{flex:none;border:0;border-radius:8px;background:var(--ok);color:#fff;font:700 13px var(--body);padding:8px 10px;cursor:pointer}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 </style>
 </head>
@@ -83,6 +85,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--sun);outline-of
   <section class="card placar" id="placar" hidden><div class="big" id="pl-total"></div><div class="sub" id="pl-sub"></div></section>
 
   <div id="tela-form" class="stack">
+    <div class="ja" id="ja" hidden><span id="ja-txt"></span><button type="button" id="ja-ver">Ver valor e Pix</button></div>
     <section class="card">
       <h2>Você</h2>
       <label class="lbl" for="nome">Seu nome completo</label>
@@ -124,7 +127,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--sun);outline-of
       <p style="margin:14px 0 0">Depois, mande o <b>comprovante no privado do Gustavo</b> pelo WhatsApp.</p>
     </section>
     <div class="aviso"><b>⚠️ Lembrete</b><p>Os valores são uma estimativa. No final, a diferença (para mais ou para menos) é acertada proporcionalmente ao que cada um pagou, com prestação de contas no grupo.</p></div>
-    <button type="button" class="btn sec" id="nova">Inscrever outra família</button>
+    <button type="button" class="btn sec" id="nova">Voltar ao início</button>
   </div>
 </div></main>
 
@@ -213,7 +216,7 @@ $('#copiar').addEventListener('click', async () => {
   setTimeout(() => $('#copiar').textContent = 'Copiar chave', 2500);
 });
 $('#nova').addEventListener('click', () => {
-  try { localStorage.removeItem('churrasco-jao-2026'); } catch (x) {}
+  avisoJa();
   Object.assign(S, { bebe: null, esposa: false, menores: 0, maioresBebem: 0, maioresNao: 0 }); $('#nome').value = '';
   $('#tela-ok').hidden = true; $('#tela-form').hidden = false; $('#barra').hidden = false;
   render(); window.scrollTo(0, 0);
@@ -233,7 +236,13 @@ async function carregarPlacar() {
   } catch (x) {}
 }
 
-try { const u = JSON.parse(localStorage.getItem('churrasco-jao-2026') || 'null'); if (u && u.valor) { ultima = u; mostrarOk(u); } } catch (x) {}
+function avisoJa() {
+  if (!ultima) { $('#ja').hidden = true; return; }
+  $('#ja-txt').textContent = `Você já inscreveu: ${ultima.nome.split(' ')[0]} · nº ${ultima.numero || '–'} · ${brl(ultima.valor)}`;
+  $('#ja').hidden = false;
+}
+$('#ja-ver').addEventListener('click', () => ultima && mostrarOk(ultima));
+try { const u = JSON.parse(localStorage.getItem('churrasco-jao-2026') || 'null'); if (u && u.valor) { ultima = u; avisoJa(); } } catch (x) {}
 render();
 carregarPlacar();
 </script>
