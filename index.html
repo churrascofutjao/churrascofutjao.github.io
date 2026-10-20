@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Churrasco do Futebol · 15/11</title>
+<meta property="og:title" content="🔥 Churrasco do Futebol – Clube Jaó · 15/11">
+<meta property="og:description" content="Inscrição da família em 1 minuto. Veja quanto fica e quem já vai.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@600;800&family=Barlow:wght@400;500;600;700&display=swap">
+<style>
+:root{--bg:#f4f5f9;--surface:#fff;--fg:#141a33;--muted:#5a6180;--line:#d9dcea;--navy:#24307a;--navy-2:#1a2360;--sun:#f47b20;--sun-ink:#fff;--sun-soft:#fde9d8;--ok:#1f6b3a;--ok-soft:#dcf0e2;--bad:#b3312f;--bad-soft:#f8dfdf;
+  --display:"Saira Condensed","Arial Narrow",system-ui,sans-serif;--body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#0d1022;--surface:#161a33;--fg:#e8eaf5;--muted:#a0a6c4;--line:#2a2f52;--navy:#2a3794;--navy-2:#1b2363;--sun:#ff8a33;--sun-ink:#1a0d03;--sun-soft:#3a2614;--ok:#3fa864;--ok-soft:#173523;--bad:#f06d6d;--bad-soft:#3d1b1f;color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font:16px/1.45 var(--body);font-variant-numeric:tabular-nums;-webkit-text-size-adjust:100%}
+.wrap{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+header{background:var(--navy);color:#fff;padding-top:env(safe-area-inset-top);position:relative;overflow:hidden}
+header::after{content:"";position:absolute;right:-60px;top:-60px;width:180px;height:180px;border-radius:50%;background:var(--sun)}
+header .wrap{padding-block:22px 20px;position:relative;z-index:1}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#c3c9ee}
+h1{font:800 38px/0.95 var(--display);margin:6px 0 8px;text-transform:uppercase;letter-spacing:.01em}
+h1 span{color:var(--sun)}
+.quando{font-weight:600;color:#e1e5ff}
+main .wrap{padding-block:16px 120px;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
+.placar .big{font:800 30px/1 var(--display);color:var(--sun)}
+.placar .sub{color:var(--muted);font-size:14px;margin-top:6px}
+.placar[hidden]{display:none}
+h2{font:800 20px/1.1 var(--display);text-transform:uppercase;letter-spacing:.03em;margin:0 0 12px}
+label.lbl{display:block;font-weight:700;font-size:14px;margin-bottom:6px}
+input[type=text]{width:100%;font:17px var(--body);color:var(--fg);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:12px}
+input[type=text]:focus{outline:none;border-color:var(--sun)}
+.q{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.q:first-of-type{border-top:0;padding-top:4px}
+.q .t{font-weight:600}
+.q .p{display:block;font-size:13px;color:var(--muted);font-weight:400}
+.seg{display:flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden;flex:none}
+.seg button{border:0;background:var(--surface);color:var(--fg);font:700 15px var(--body);padding:9px 16px;cursor:pointer;min-width:58px}
+.seg button+button{border-left:1.5px solid var(--line)}
+.seg button[aria-pressed=true]{background:var(--navy);color:#fff}
+.step{display:flex;align-items:center;gap:4px;flex:none}
+.step button{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);color:var(--fg);font:700 22px/1 var(--body);cursor:pointer}
+.step button:disabled{opacity:.35;cursor:default}
+.step output{min-width:30px;text-align:center;font:800 22px var(--display)}
+.conta table{width:100%;border-collapse:collapse;font-size:15px;table-layout:fixed}
+.conta td{padding:6px 0;border-bottom:1px dashed var(--line)}
+.conta td:last-child{text-align:right;white-space:nowrap;width:30%}
+.conta tr.total td{border-bottom:0;padding-top:12px;font:800 26px var(--display);text-transform:uppercase}
+.conta tr.total td:last-child{color:var(--sun)}
+.aviso{background:var(--sun-soft);border-radius:12px;padding:14px;font-size:14px}
+.aviso b{display:block;margin-bottom:4px}
+.aviso p{margin:6px 0 0}
+.barra{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:5}
+.barra .wrap{padding-block:12px}
+.btn{width:100%;border:0;border-radius:12px;background:var(--sun);color:var(--sun-ink);font:800 20px var(--display);text-transform:uppercase;letter-spacing:.03em;padding:14px;cursor:pointer}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.sec{background:transparent;color:var(--fg);border:1.5px solid var(--line);font-size:16px}
+.erro{background:var(--bad-soft);color:var(--bad);border-radius:10px;padding:10px 12px;font-size:14px;font-weight:600}
+.ok-num{font:800 18px var(--display);color:var(--ok);text-transform:uppercase;letter-spacing:.04em}
+.valor{font:800 52px/1 var(--display);color:var(--sun);margin:6px 0}
+.pix{display:flex;gap:8px;align-items:center;background:var(--bg);border:1.5px dashed var(--line);border-radius:10px;padding:10px 12px;margin-top:10px}
+.pix code{flex:1;min-width:0;font:600 16px var(--body);overflow-wrap:anywhere;user-select:all}
+.pix button{flex:none;border:0;border-radius:8px;background:var(--navy);color:#fff;font:700 14px var(--body);padding:8px 12px;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
+.mut{color:var(--muted)}
+[hidden]{display:none!important}
+.stack{display:flex;flex-direction:column;gap:14px}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="eyebrow">Clube Jaó · Futebol de domingo</div>
+  <h1>Churrasco do <span>Futebol</span></h1>
+  <div class="quando" id="quando">Domingo, 15 de novembro</div>
+</div></header>
+
+<main><div class="wrap" id="app">
+  <section class="card placar" id="placar" hidden><div class="big" id="pl-total"></div><div class="sub" id="pl-sub"></div></section>
+
+  <div id="tela-form" class="stack">
+    <section class="card">
+      <h2>Você</h2>
+      <label class="lbl" for="nome">Seu nome completo</label>
+      <input type="text" id="nome" autocomplete="name" placeholder="Ex.: Thiago Negrão" maxlength="80">
+      <div class="hp" aria-hidden="true"><label for="site">Não preencha</label><input type="text" id="site" tabindex="-1" autocomplete="off"></div>
+      <div class="q" style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px">
+        <span class="t">Vai beber chopp?<span class="p">Sim R$ 80 · Não R$ 50</span></span>
+        <div class="seg" data-k="bebe"><button type="button" data-v="1" aria-pressed="false">Sim</button><button type="button" data-v="0" aria-pressed="false">Não</button></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Quem vai com você</h2>
+      <div class="q"><span class="t">Esposa<span class="p">R$ 30</span></span>
+        <div class="seg" data-k="esposa"><button type="button" data-v="1" aria-pressed="false">Vai</button><button type="button" data-v="0" aria-pressed="true">Não</button></div></div>
+      <div class="q"><span class="t">Filhos menores de 18<span class="p">R$ 30 cada</span></span>
+        <div class="step" data-k="menores"><button type="button" data-d="-1" aria-label="Menos">−</button><output>0</output><button type="button" data-d="1" aria-label="Mais">+</button></div></div>
+      <div class="q"><span class="t">Filhos 18+ que bebem chopp<span class="p">R$ 80 cada</span></span>
+        <div class="step" data-k="maioresBebem"><button type="button" data-d="-1" aria-label="Menos">−</button><output>0</output><button type="button" data-d="1" aria-label="Mais">+</button></div></div>
+      <div class="q"><span class="t">Filhos 18+ que não bebem<span class="p">R$ 50 cada</span></span>
+        <div class="step" data-k="maioresNao"><button type="button" data-d="-1" aria-label="Menos">−</button><output>0</output><button type="button" data-d="1" aria-label="Mais">+</button></div></div>
+    </section>
+
+    <section class="card conta"><h2>Sua conta</h2><table><colgroup><col style="width:70%"><col style="width:30%"></colgroup><tbody id="conta"></tbody></table></section>
+
+    <div class="aviso"><b>⚠️ Os valores são uma estimativa.</b>
+      <p>Depois do churrasco, todos os custos serão somados e apresentados no grupo com os comprovantes. Se faltar, a diferença será dividida entre todos, proporcional ao valor que cada um pagou.</p>
+      <p>Se sobrar, será informado no grupo: se for uma quantia relevante, será devolvida; se for pouco, decidimos juntos o que fazer.</p></div>
+    <div class="erro" id="erro" hidden></div>
+  </div>
+
+  <div id="tela-ok" class="stack" hidden>
+    <section class="card">
+      <div class="ok-num" id="ok-num"></div>
+      <p style="margin:10px 0 0">Para confirmar, mande no Pix o valor de</p>
+      <div class="valor" id="ok-valor"></div>
+      <div class="mut" id="ok-quem"></div>
+      <div class="pix" id="ok-pix"><code id="pix-txt"></code><button type="button" id="copiar">Copiar chave</button></div>
+      <p style="margin:14px 0 0">Depois, mande o <b>comprovante no privado do Gustavo</b> pelo WhatsApp.</p>
+    </section>
+    <div class="aviso"><b>⚠️ Lembrete</b><p>Os valores são uma estimativa. No final, a diferença (para mais ou para menos) é acertada proporcionalmente ao que cada um pagou, com prestação de contas no grupo.</p></div>
+    <button type="button" class="btn sec" id="nova">Inscrever outra família</button>
+  </div>
+</div></main>
+
+<div class="barra" id="barra"><div class="wrap"><button type="button" class="btn" id="enviar" disabled>Escolha se vai beber chopp</button></div></div>
+
+<script>
+const ENDPOINT = ''; // URL do App da Web do Apps Script (termina em /exec)
+const PRECO = { chopp: 80, semAlcool: 50, familiar: 30 };
+const S = { bebe: null, esposa: false, menores: 0, maioresBebem: 0, maioresNao: 0 };
+const $ = s => document.querySelector(s);
+const brl = n => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0 });
+let ultima = null, fechada = false;
+
+function itens() {
+  const L = [];
+  if (S.bebe !== null) L.push(['Você ' + (S.bebe ? '(com chopp)' : '(sem álcool)'), S.bebe ? PRECO.chopp : PRECO.semAlcool]);
+  if (S.esposa) L.push(['Esposa', PRECO.familiar]);
+  if (S.menores) L.push([`${S.menores} filho${S.menores > 1 ? 's' : ''} menor${S.menores > 1 ? 'es' : ''} de 18`, S.menores * PRECO.familiar]);
+  if (S.maioresBebem) L.push([`${S.maioresBebem} filho${S.maioresBebem > 1 ? 's' : ''} 18+ com chopp`, S.maioresBebem * PRECO.chopp]);
+  if (S.maioresNao) L.push([`${S.maioresNao} filho${S.maioresNao > 1 ? 's' : ''} 18+ sem álcool`, S.maioresNao * PRECO.semAlcool]);
+  return L;
+}
+const pessoas = () => 1 + (S.esposa ? 1 : 0) + S.menores + S.maioresBebem + S.maioresNao;
+
+function render() {
+  document.querySelectorAll('.seg').forEach(g => {
+    const v = S[g.dataset.k];
+    g.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(v !== null && (b.dataset.v === '1') === v)));
+  });
+  document.querySelectorAll('.step').forEach(g => {
+    const v = S[g.dataset.k];
+    g.querySelector('output').textContent = v;
+    g.querySelector('[data-d="-1"]').disabled = v <= 0;
+    g.querySelector('[data-d="1"]').disabled = v >= 10;
+  });
+  const L = itens(), total = L.reduce((t, x) => t + x[1], 0);
+  $('#conta').innerHTML = (L.length ? L.map(([t, v]) => `<tr><td>${t}</td><td>${brl(v)}</td></tr>`).join('') : '<tr><td class="mut">Responda se vai beber chopp.</td><td></td></tr>')
+    + `<tr class="total"><td>Total · ${pessoas()} pessoa${pessoas() > 1 ? 's' : ''}</td><td>${brl(total)}</td></tr>`;
+  const b = $('#enviar');
+  if (!ENDPOINT) { b.disabled = true; b.textContent = 'Inscrições abrem em breve'; return; }
+  if (fechada) { b.disabled = true; b.textContent = 'Lista encerrada'; return; }
+  if (S.bebe === null) { b.disabled = true; b.textContent = 'Escolha se vai beber chopp'; return; }
+  b.disabled = false; b.textContent = `Confirmar inscrição · ${brl(total)}`;
+}
+
+document.addEventListener('click', e => {
+  const s = e.target.closest('.seg button');
+  if (s) { S[s.parentElement.dataset.k] = s.dataset.v === '1'; render(); return; }
+  const st = e.target.closest('.step button');
+  if (st) { const k = st.parentElement.dataset.k; S[k] = Math.max(0, Math.min(10, S[k] + Number(st.dataset.d))); render(); }
+});
+
+$('#enviar').addEventListener('click', async () => {
+  const nome = $('#nome').value.trim().replace(/\s+/g, ' ');
+  const erro = $('#erro'); erro.hidden = true;
+  if (nome.split(' ').length < 2) { erro.textContent = 'Escreva seu nome completo (nome e sobrenome).'; erro.hidden = false; $('#nome').focus(); return; }
+  const b = $('#enviar'); b.disabled = true; b.textContent = 'Enviando…';
+  try {
+    const r = await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ nome, ...S, site: $('#site').value }) });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.erro || 'Não foi possível enviar.');
+    ultima = { nome, numero: j.numero, valor: j.valor, pessoas: j.pessoas, pix: j.pix };
+    try { localStorage.setItem('churrasco-jao-2026', JSON.stringify(ultima)); } catch (x) {}
+    mostrarOk(ultima);
+    carregarPlacar();
+  } catch (x) {
+    erro.textContent = (x && x.message && !/fetch|network|json/i.test(x.message)) ? x.message : 'Não consegui enviar. Confira a internet e tente de novo. Se continuar, mande sua inscrição no privado do Gustavo.';
+    erro.hidden = false; render();
+  }
+});
+
+function mostrarOk(u) {
+  $('#tela-form').hidden = true; $('#barra').hidden = true; $('#tela-ok').hidden = false;
+  $('#ok-num').textContent = u.numero ? `✅ Inscrição nº ${u.numero} recebida` : '✅ Inscrição recebida';
+  $('#ok-valor').textContent = brl(u.valor);
+  $('#ok-quem').textContent = `${u.nome} · ${u.pessoas} pessoa${u.pessoas > 1 ? 's' : ''}`;
+  $('#pix-txt').textContent = u.pix || 'chave enviada no grupo do WhatsApp';
+  $('#copiar').hidden = !u.pix;
+  window.scrollTo(0, 0);
+}
+$('#copiar').addEventListener('click', async () => {
+  const t = $('#pix-txt').textContent;
+  try { await navigator.clipboard.writeText(t); $('#copiar').textContent = 'Copiada ✓'; }
+  catch (x) { const r = document.createRange(); r.selectNodeContents($('#pix-txt')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); $('#copiar').textContent = 'Selecionada'; }
+  setTimeout(() => $('#copiar').textContent = 'Copiar chave', 2500);
+});
+$('#nova').addEventListener('click', () => {
+  try { localStorage.removeItem('churrasco-jao-2026'); } catch (x) {}
+  Object.assign(S, { bebe: null, esposa: false, menores: 0, maioresBebem: 0, maioresNao: 0 }); $('#nome').value = '';
+  $('#tela-ok').hidden = true; $('#tela-form').hidden = false; $('#barra').hidden = false;
+  render(); window.scrollTo(0, 0);
+});
+
+async function carregarPlacar() {
+  if (!ENDPOINT) return;
+  try {
+    const j = await (await fetch(ENDPOINT)).json();
+    if (!j.ok) return;
+    if (j.horario) $('#quando').textContent = 'Domingo, 15 de novembro · ' + j.horario;
+    $('#pl-total').textContent = j.total ? `🔥 Já são ${j.total} pessoas inscritas` : '🔥 Lista aberta: seja o primeiro!';
+    $('#pl-sub').textContent = (j.ultimos.length ? 'Últimos a entrar: ' + j.ultimos.join(', ') + (j.resto ? ` e mais ${j.resto}` : '') + ' · ' : '')
+      + (j.aberto ? 'Lista fecha domingo, 08/11' : 'Lista encerrada');
+    $('#placar').hidden = false;
+    fechada = !j.aberto; render();
+  } catch (x) {}
+}
+
+try { const u = JSON.parse(localStorage.getItem('churrasco-jao-2026') || 'null'); if (u && u.valor) { ultima = u; mostrarOk(u); } } catch (x) {}
+render();
+carregarPlacar();
+</script>
+</body>
+</html>
