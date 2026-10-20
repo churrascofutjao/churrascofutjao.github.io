@@ -225,7 +225,7 @@ async function carregarPlacar() {
     const j = await (await fetch(ENDPOINT)).json();
     if (!j.ok) return;
     if (j.horario) $('#quando').textContent = 'Domingo, 15 de novembro · ' + j.horario;
-    $('#pl-total').textContent = j.total ? `🔥 Já são ${j.total} pessoas inscritas` : '🔥 Lista aberta: seja o primeiro!';
+    $('#pl-total').textContent = !j.total ? '🔥 Lista aberta: seja o primeiro!' : j.total === 1 ? '🔥 1 pessoa inscrita' : `🔥 Já são ${j.total} pessoas inscritas`;
     $('#pl-sub').textContent = (j.ultimos.length ? 'Últimos a entrar: ' + j.ultimos.join(', ') + (j.resto ? ` e mais ${j.resto}` : '') + ' · ' : '')
       + (j.aberto ? 'Lista fecha domingo, 08/11' : 'Lista encerrada');
     $('#placar').hidden = false;
