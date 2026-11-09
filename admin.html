@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Organizador · Churrasco</title>
+<style>
+:root{--bg:#f4f5f9;--surface:#fff;--fg:#141a33;--muted:#5a6180;--line:#d9dcea;--navy:#24307a;--sun:#f47b20;--ok:#1f6b3a;--ok-soft:#dcf0e2;--bad:#b3312f;--bad-soft:#f8dfdf;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#0d1022;--surface:#161a33;--fg:#e8eaf5;--muted:#a0a6c4;--line:#2a2f52;--navy:#2a3794;--sun:#ff8a33;--ok:#3fa864;--ok-soft:#173523;--bad:#f06d6d;--bad-soft:#3d1b1f;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;padding:16px;max-width:760px;margin-inline:auto}
+h1{font-size:22px;margin:4px 0 12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px}
+input,button{font:inherit;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--fg)}
+button{background:var(--navy);color:#fff;border:0;cursor:pointer;font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.kpi b{display:block;font-size:22px}.kpi span{font-size:12.5px;color:var(--muted)}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.nome{font-weight:700}.sub{font-size:13px;color:var(--muted);margin-top:2px}
+.val{text-align:right;white-space:nowrap;font-weight:700}
+.pill{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;margin-top:4px}
+.ok{background:var(--ok-soft);color:var(--ok)}.nao{background:var(--bad-soft);color:var(--bad)}
+.warn{font-size:12.5px;color:var(--sun);margin-top:4px}
+#erro{color:var(--bad);margin-top:8px}
+.top{display:flex;gap:8px;margin-bottom:12px}.top button{flex:none}
+</style>
+</head>
+<body>
+<h1>🍖 Churrasco · Organizador</h1>
+
+<div id="login" class="card">
+  <p style="margin-top:0">Digite a senha do organizador:</p>
+  <div class="top" style="margin:0"><input id="senha" type="password" style="flex:1" autocomplete="current-password"><button id="entrar">Entrar</button></div>
+  <div id="erro"></div>
+</div>
+
+<div id="painel" hidden>
+  <div class="kpis" id="kpis"></div>
+  <div class="top"><input id="busca" placeholder="Buscar nome…" style="flex:1"><button id="atualizar">Atualizar</button></div>
+  <div id="lista"></div>
+</div>
+
+<script>
+const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxqgOhMPAJcbGDPCqZO1MtbRr_84sMASnHwoLOO8-ahV6SnQyRG2Rpkjyq1bdMEXkhomw/exec';
+const $ = s => document.querySelector(s);
+const brl = n => 'R$ ' + Number(n).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let dados = [], senha = '';
+try { senha = sessionStorage.getItem('adm') || ''; } catch (e) {}
+
+async function carregar() {
+  $('#erro').textContent = '';
+  try {
+    const j = await (await fetch(ENDPOINT + '?admin=' + encodeURIComponent(senha))).json();
+    if (!j.ok) { $('#erro').textContent = j.erro || 'Erro.'; $('#login').hidden = false; $('#painel').hidden = true; return; }
+    dados = j.itens;
+    try { sessionStorage.setItem('adm', senha); } catch (e) {}
+    $('#login').hidden = true; $('#painel').hidden = false; render();
+  } catch (e) { $('#erro').textContent = 'Sem conexão. Tente de novo.'; }
+}
+
+function acomp(i) {
+  const p = [];
+  if (i.esposa) p.push('esposa');
+  if (i.menores) p.push(i.menores + ' filho(s) <18');
+  if (i.maioresBebem) p.push(i.maioresBebem + ' filho(s) 18+ bebem');
+  if (i.maioresNao) p.push(i.maioresNao + ' filho(s) 18+ não bebem');
+  return p.length ? 'Vai com: ' + p.join(', ') : 'Vai sozinho';
+}
+
+function render() {
+  const pessoas = dados.reduce((a, i) => a + i.pessoas, 0);
+  const total = dados.reduce((a, i) => a + i.valor, 0);
+  const pago = dados.filter(i => i.pago).reduce((a, i) => a + i.valor, 0);
+  $('#kpis').innerHTML =
+    `<div class="kpi"><b>${dados.length}</b><span>inscrições</span></div>` +
+    `<div class="kpi"><b>${pessoas}</b><span>pessoas</span></div>` +
+    `<div class="kpi"><b>${brl(pago)}</b><span>recebido (${dados.filter(i => i.pago).length} pagos)</span></div>` +
+    `<div class="kpi"><b>${brl(total - pago)}</b><span>a receber (total ${brl(total)})</span></div>`;
+  const q = $('#busca').value.trim().toLowerCase();
+  $('#lista').innerHTML = dados.map((i, n) => ({ i, n: n + 1 }))
+    .filter(x => !q || x.i.nome.toLowerCase().includes(q))
+    .map(({ i, n }) => `<div class="card"><div class="row"><div><div class="nome">${n}. ${esc(i.nome)}</div>
+      <div class="sub">${i.bebe ? '🍺 bebe chopp' : 'não bebe'} · ${acomp(i)} · ${i.pessoas} pessoa(s)</div>
+      <div class="sub">${esc(i.quando)}</div>
+      ${i.obs ? `<div class="warn">⚠ ${esc(i.obs)}</div>` : ''}</div>
+      <div class="val">${brl(i.valor)}<br><span class="pill ${i.pago ? 'ok' : 'nao'}">${i.pago ? 'PAGO' : 'a pagar'}</span></div></div></div>`).join('')
+    || '<p>Nenhuma inscrição.</p>';
+}
+
+$('#entrar').onclick = () => { senha = $('#senha').value; carregar(); };
+$('#senha').addEventListener('keydown', e => { if (e.key === 'Enter') $('#entrar').click(); });
+$('#atualizar').onclick = carregar;
+$('#busca').oninput = render;
+if (senha) carregar();
+</script>
+</body>
+</html>
