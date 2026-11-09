@@ -23,6 +23,9 @@ button{background:var(--navy);color:#fff;border:0;cursor:pointer;font-weight:600
 .pill{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;margin-top:4px}
 .ok{background:var(--ok-soft);color:var(--ok)}.nao{background:var(--bad-soft);color:var(--bad)}
 .warn{font-size:12.5px;color:var(--sun);margin-top:4px}
+.val button{margin-top:6px;font-size:14px}
+.val button.pagar{background:var(--sun);color:#1a0d03}
+.val button.desf{background:var(--ok-soft);color:var(--ok);border:1px solid var(--ok)}
 #erro{color:var(--bad);margin-top:8px}
 .top{display:flex;gap:8px;margin-bottom:12px}.top button{flex:none}
 </style>
@@ -86,10 +89,22 @@ function render() {
       <div class="sub">${i.bebe ? '🍺 bebe chopp' : 'não bebe'} · ${acomp(i)} · ${i.pessoas} pessoa(s)</div>
       <div class="sub">${esc(i.quando)}</div>
       ${i.obs ? `<div class="warn">⚠ ${esc(i.obs)}</div>` : ''}</div>
-      <div class="val">${brl(i.valor)}<br><span class="pill ${i.pago ? 'ok' : 'nao'}">${i.pago ? 'PAGO' : 'a pagar'}</span></div></div></div>`).join('')
+      <div class="val">${brl(i.valor)}<br><button class="${i.pago ? 'desf' : 'pagar'}" data-l="${i.linha}" data-n="${esc(i.nome)}" data-p="${i.pago ? 0 : 1}">${i.pago ? '✅ PAGO (desfazer)' : 'Marcar como PAGO'}</button></div></div></div>`).join('')
     || '<p>Nenhuma inscrição.</p>';
 }
 
+$('#lista').addEventListener('click', async e => {
+  const b = e.target.closest('button[data-l]'); if (!b) return;
+  const marcar = b.dataset.p === '1';
+  if (!marcar && !confirm('Desfazer o pagamento de ' + b.dataset.n + '?')) return;
+  b.disabled = true; b.textContent = 'Salvando…';
+  try {
+    const j = await (await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ admin: senha, pagoLinha: Number(b.dataset.l), nome: b.dataset.n, pago: marcar }) })).json();
+    if (!j.ok) alert(j.erro || 'Erro ao salvar.');
+  } catch (x) { alert('Sem conexão. Tente de novo.'); }
+  carregar();
+});
 $('#entrar').onclick = () => { senha = $('#senha').value; carregar(); };
 $('#senha').addEventListener('keydown', e => { if (e.key === 'Enter') $('#entrar').click(); });
 $('#atualizar').onclick = carregar;
