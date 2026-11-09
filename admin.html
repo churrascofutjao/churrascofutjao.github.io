@@ -113,9 +113,9 @@ function textoZap() {
   const pg = dados.filter(i => i.pago), dev = dados.filter(i => !i.pago);
   const soma = l => l.reduce((a, i) => a + i.valor, 0);
   let t = '🍖 *CHURRASCO DO JAÓ – 15/11*\n\n';
-  t += `✅ *PAGARAM* (${pg.length} inscrições · ${pessoas(pg)} pessoas)\n`;
+  t += `✅ *PAGARAM* (${pg.length} inscrições · ${pessoas(pg)} pessoas)\n💵 *Total recebido: ${brl(soma(pg))}*\n`;
   t += pg.length ? pg.map((i, k) => linha(i, k + 1)).join('\n') : 'Ninguém ainda';
-  t += `\n\n⏳ *FALTA PAGAR* (${dev.length} inscrições · ${pessoas(dev)} pessoas · ${brl(soma(dev))})\n`;
+  t += `\n\n⏳ *FALTA PAGAR* (${dev.length} inscrições · ${pessoas(dev)} pessoas)\n💸 *Total a receber: ${brl(soma(dev))}*\n`;
   t += dev.length ? dev.map((i, k) => linha(i, k + 1)).join('\n') : 'Todos pagaram! 🎉';
   t += '\n\n💰 Pix (CPF): 00570735114\nGustavo Papini Gomes de Sousa\n\nVaga só garantida com o pagamento! 🙏';
   return t;
