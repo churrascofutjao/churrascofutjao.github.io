@@ -117,6 +117,8 @@ function textoZap() {
   t += pg.length ? pg.map((i, k) => linha(i, k + 1)).join('\n') : 'Ninguém ainda';
   t += `\n\n⏳ *FALTA PAGAR* (${dev.length} inscrições · ${pessoas(dev)} pessoas)\n💸 *Total a receber: ${brl(soma(dev))}*\n`;
   t += dev.length ? dev.map((i, k) => linha(i, k + 1)).join('\n') : 'Todos pagaram! 🎉';
+  t += `\n\n👥 *Total de pessoas: ${pessoas(dados)}* (pagaram ${pessoas(pg)} · falta pagar ${pessoas(dev)})`;
+  t += '\n\n👉 Inscrição: https://churrascofutjao.github.io';
   t += '\n\n💰 Pix (CPF): 00570735114\nGustavo Papini Gomes de Sousa\n\nVaga só garantida com o pagamento! 🙏';
   return t;
 }
