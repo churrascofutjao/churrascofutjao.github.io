@@ -42,6 +42,8 @@ button{background:var(--navy);color:#fff;border:0;cursor:pointer;font-weight:600
 <div id="painel" hidden>
   <div class="kpis" id="kpis"></div>
   <div class="top"><input id="busca" placeholder="Buscar nome…" style="flex:1"><button id="atualizar">Atualizar</button></div>
+  <div class="top"><button id="zap" style="flex:1;background:#1f8f4e">📋 Copiar lista para o WhatsApp</button></div>
+  <textarea id="zaptxt" rows="14" hidden readonly style="width:100%;margin-bottom:12px;font:inherit;padding:10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--fg)"></textarea>
   <div id="lista"></div>
 </div>
 
@@ -105,6 +107,26 @@ $('#lista').addEventListener('click', async e => {
   } catch (x) { alert('Sem conexão. Tente de novo.'); }
   carregar();
 });
+function textoZap() {
+  const pessoas = l => l.reduce((a, i) => a + i.pessoas, 0);
+  const linha = (i, n) => `${n}. ${i.nome}${i.pessoas > 1 ? ` (+${i.pessoas - 1})` : ''} – ${brl(i.valor)}`;
+  const pg = dados.filter(i => i.pago), dev = dados.filter(i => !i.pago);
+  const soma = l => l.reduce((a, i) => a + i.valor, 0);
+  let t = '🍖 *CHURRASCO DO JAÓ – 15/11*\n\n';
+  t += `✅ *PAGARAM* (${pg.length} inscrições · ${pessoas(pg)} pessoas)\n`;
+  t += pg.length ? pg.map((i, k) => linha(i, k + 1)).join('\n') : 'Ninguém ainda';
+  t += `\n\n⏳ *FALTA PAGAR* (${dev.length} inscrições · ${pessoas(dev)} pessoas · ${brl(soma(dev))})\n`;
+  t += dev.length ? dev.map((i, k) => linha(i, k + 1)).join('\n') : 'Todos pagaram! 🎉';
+  t += '\n\n💰 Pix (CPF): 00570735114\nGustavo Papini Gomes de Sousa\n\nVaga só garantida com o pagamento! 🙏';
+  return t;
+}
+$('#zap').onclick = async () => {
+  const t = textoZap(), a = $('#zaptxt');
+  a.value = t; a.hidden = false;
+  try { await navigator.clipboard.writeText(t); $('#zap').textContent = '✅ Copiado! Cole no WhatsApp'; }
+  catch (e) { a.select(); $('#zap').textContent = 'Selecione o texto abaixo e copie'; }
+  setTimeout(() => { $('#zap').textContent = '📋 Copiar lista para o WhatsApp'; }, 4000);
+};
 $('#entrar').onclick = () => { senha = $('#senha').value; carregar(); };
 $('#senha').addEventListener('keydown', e => { if (e.key === 'Enter') $('#entrar').click(); });
 $('#atualizar').onclick = carregar;
