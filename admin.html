@@ -26,6 +26,20 @@ button{background:var(--navy);color:#fff;border:0;cursor:pointer;font-weight:600
 .val button{margin-top:6px;font-size:14px}
 .val button.pagar{background:var(--sun);color:#1a0d03}
 .val button.desf{background:var(--ok-soft);color:var(--ok);border:1px solid var(--ok)}
+.val button.edit{background:transparent;color:var(--navy);border:1px solid var(--line);font-size:13px}
+@media (prefers-color-scheme:dark){.val button.edit{color:var(--fg)}}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:flex-start;justify-content:center;padding:16px;overflow:auto;z-index:10}
+#modal[hidden]{display:none}
+#modal .box{background:var(--surface);border-radius:14px;padding:16px;width:100%;max-width:460px;margin-top:20px}
+#modal label{display:block;font-size:13px;color:var(--muted);margin:10px 0 3px}
+#modal input[type=text],#modal input[type=number]{width:100%}
+#modal .chk{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:16px;color:var(--fg)}
+#modal .chk input{width:20px;height:20px}
+#modal .acoes{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+#modal .acoes button{flex:1}
+#modal .cinza{background:var(--line);color:var(--fg)}
+#modal .verm{background:var(--bad);color:#fff}
+#mauto{font-size:12.5px;color:var(--muted);margin-top:3px}
 #erro{color:var(--bad);margin-top:8px}
 .top{display:flex;gap:8px;margin-bottom:12px}.top button{flex:none}
 </style>
@@ -46,6 +60,22 @@ button{background:var(--navy);color:#fff;border:0;cursor:pointer;font-weight:600
   <textarea id="zaptxt" rows="14" hidden readonly style="width:100%;margin-bottom:12px;font:inherit;padding:10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--fg)"></textarea>
   <div id="lista"></div>
 </div>
+
+<div id="modal" hidden><div class="box">
+  <h2 style="margin:0 0 4px;font-size:18px">Editar inscrição</h2>
+  <label for="m-nome">Nome</label><input id="m-nome" type="text">
+  <label class="chk"><input id="m-bebe" type="checkbox"> Ele bebe chopp (R$ 80; senão R$ 50)</label>
+  <label class="chk"><input id="m-esposa" type="checkbox"> Vai com a esposa (+R$ 30)</label>
+  <label for="m-men">Filhos menores de 18 (R$ 30 cada)</label><input id="m-men" type="number" min="0" max="10">
+  <label for="m-mb">Filhos 18+ que bebem (R$ 80 cada)</label><input id="m-mb" type="number" min="0" max="10">
+  <label for="m-mn">Filhos 18+ que não bebem (R$ 50 cada)</label><input id="m-mn" type="number" min="0" max="10">
+  <label for="m-valor">Valor a pagar (R$)</label><input id="m-valor" type="number" min="0" step="1">
+  <div id="mauto"></div>
+  <label for="m-obs">Observação</label><input id="m-obs" type="text">
+  <div id="merro" style="color:var(--bad);margin-top:8px"></div>
+  <div class="acoes"><button id="m-salvar">Salvar</button><button id="m-cancelar" class="cinza">Cancelar</button></div>
+  <div class="acoes"><button id="m-remover" class="verm">🗑 Remover esta inscrição</button></div>
+</div></div>
 
 <script>
 const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxqgOhMPAJcbGDPCqZO1MtbRr_84sMASnHwoLOO8-ahV6SnQyRG2Rpkjyq1bdMEXkhomw/exec';
@@ -91,7 +121,7 @@ function render() {
       <div class="sub">${i.bebe ? '🍺 bebe chopp' : 'não bebe'} · ${acomp(i)} · ${i.pessoas} pessoa(s)</div>
       <div class="sub">${esc(i.quando)}</div>
       ${i.obs ? `<div class="warn">⚠ ${esc(i.obs)}</div>` : ''}</div>
-      <div class="val">${brl(i.valor)}<br><button class="${i.pago ? 'desf' : 'pagar'}" data-l="${i.linha}" data-n="${esc(i.nome)}" data-p="${i.pago ? 0 : 1}">${i.pago ? '✅ PAGO (desfazer)' : 'Marcar como PAGO'}</button></div></div></div>`).join('')
+      <div class="val">${brl(i.valor)}<br><button class="${i.pago ? 'desf' : 'pagar'}" data-l="${i.linha}" data-n="${esc(i.nome)}" data-p="${i.pago ? 0 : 1}">${i.pago ? '✅ PAGO (desfazer)' : 'Marcar como PAGO'}</button><br><button class="edit" data-e="${i.linha}">✏️ Editar</button></div></div></div>`).join('')
     || '<p>Nenhuma inscrição.</p>';
 }
 
@@ -107,6 +137,50 @@ $('#lista').addEventListener('click', async e => {
   } catch (x) { alert('Sem conexão. Tente de novo.'); }
   carregar();
 });
+/* ---- editar / remover inscrição ---- */
+let EDIT = null, valorManual = false;
+const n0 = v => Math.max(0, Math.min(10, Math.floor(Number(v)) || 0));
+function valorAuto() {
+  return ($('#m-bebe').checked ? 80 : 50) + ($('#m-esposa').checked ? 30 : 0)
+    + n0($('#m-men').value) * 30 + n0($('#m-mb').value) * 80 + n0($('#m-mn').value) * 50;
+}
+function atualizaAuto() {
+  const v = valorAuto();
+  if (!valorManual) $('#m-valor').value = v;
+  $('#mauto').textContent = 'Pelas regras: ' + brl(v) + (valorManual && Number($('#m-valor').value) !== v ? ' (você está usando outro valor)' : '');
+}
+$('#lista').addEventListener('click', e => {
+  const b = e.target.closest('button[data-e]'); if (!b) return;
+  EDIT = dados.find(x => String(x.linha) === b.dataset.e); if (!EDIT) return;
+  $('#m-nome').value = EDIT.nome; $('#m-bebe').checked = EDIT.bebe; $('#m-esposa').checked = EDIT.esposa;
+  $('#m-men').value = EDIT.menores; $('#m-mb').value = EDIT.maioresBebem; $('#m-mn').value = EDIT.maioresNao;
+  $('#m-obs').value = EDIT.obs || ''; $('#m-valor').value = EDIT.valor; $('#merro').textContent = '';
+  valorManual = true; atualizaAuto(); $('#modal').hidden = false;
+});
+['#m-bebe', '#m-esposa', '#m-men', '#m-mb', '#m-mn'].forEach(s => $(s).addEventListener('input', () => { valorManual = false; atualizaAuto(); }));
+$('#m-valor').addEventListener('input', () => { valorManual = true; atualizaAuto(); });
+$('#m-cancelar').onclick = () => { $('#modal').hidden = true; EDIT = null; };
+async function enviarAdmin(corpo) {
+  const j = await (await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ admin: senha, nome: EDIT.nome, ...corpo }) })).json();
+  if (!j.ok) throw new Error(j.erro || 'Erro ao salvar.');
+}
+$('#m-salvar').onclick = async () => {
+  if (!EDIT) return; const b = $('#m-salvar'); b.disabled = true; b.textContent = 'Salvando…';
+  try {
+    await enviarAdmin({ editarLinha: EDIT.linha, novoNome: $('#m-nome').value, bebe: $('#m-bebe').checked, esposa: $('#m-esposa').checked,
+      menores: n0($('#m-men').value), maioresBebem: n0($('#m-mb').value), maioresNao: n0($('#m-mn').value),
+      valor: Number($('#m-valor').value), obs: $('#m-obs').value });
+    $('#modal').hidden = true; EDIT = null; carregar();
+  } catch (x) { $('#merro').textContent = x.message === 'Failed to fetch' ? 'Sem conexão. Tente de novo.' : x.message; }
+  b.disabled = false; b.textContent = 'Salvar';
+};
+$('#m-remover').onclick = async () => {
+  if (!EDIT || !confirm('Remover a inscrição de ' + EDIT.nome + '? Isso apaga a linha da planilha.')) return;
+  try { await enviarAdmin({ removerLinha: EDIT.linha }); $('#modal').hidden = true; EDIT = null; carregar(); }
+  catch (x) { $('#merro').textContent = x.message; }
+};
+
 function textoZap() {
   const pessoas = l => l.reduce((a, i) => a + i.pessoas, 0);
   const linha = (i, n) => `${n}. ${i.nome}${i.pessoas > 1 ? ` (+${i.pessoas - 1})` : ''} – ${brl(i.valor)}`;
