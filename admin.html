@@ -23,6 +23,21 @@ button{background:var(--navy);color:#fff;border:0;cursor:pointer;font-weight:600
 .pill{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;margin-top:4px}
 .ok{background:var(--ok-soft);color:var(--ok)}.nao{background:var(--bad-soft);color:var(--bad)}
 .warn{font-size:12.5px;color:var(--sun);margin-top:4px}
+.kpis{grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px}
+.kpi{padding:6px 8px;border-radius:10px}.kpi b{font-size:16px}.kpi span{font-size:11px;line-height:1.2;display:block}
+@media (max-width:560px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.it{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--sun);border-radius:8px;padding:5px 8px;margin-bottom:4px}
+.it-pg{border-left-color:var(--ok)}
+.it-main{flex:1;min-width:0}
+.it-nome{font-weight:700;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it-nome .n{color:var(--muted);font-weight:600}
+.it-sub{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.warn2{color:var(--sun);font-weight:600}
+.it-val{font-weight:700;font-size:14px;white-space:nowrap}
+.it button{padding:5px 9px;font-size:13px;border-radius:7px;margin:0;white-space:nowrap}
+.it button.pagar{background:var(--sun);color:#1a0d03;min-width:62px}
+.it button.desf{background:var(--ok-soft);color:var(--ok);border:1px solid var(--ok);min-width:62px}
+.it button.edit{background:transparent;border:1px solid var(--line);padding:5px 7px}
 .val button{margin-top:6px;font-size:14px}
 .val button.pagar{background:var(--sun);color:#1a0d03}
 .val button.desf{background:var(--ok-soft);color:var(--ok);border:1px solid var(--ok)}
@@ -105,6 +120,15 @@ function acomp(i) {
   return p.length ? 'Vai com: ' + p.join(', ') : 'Vai sozinho';
 }
 
+function acompCurto(i) {
+  const p = [];
+  if (i.esposa) p.push('esposa');
+  if (i.menores) p.push(i.menores + ' filho(s) <18');
+  if (i.maioresBebem) p.push(i.maioresBebem + ' filho(s) 18+ bebem');
+  if (i.maioresNao) p.push(i.maioresNao + ' filho(s) 18+ não bebem');
+  return p.length ? ' · com ' + p.join(', ') + ' (' + i.pessoas + ' pessoas)' : '';
+}
+
 function render() {
   const pessoas = dados.reduce((a, i) => a + i.pessoas, 0);
   const total = dados.reduce((a, i) => a + i.valor, 0);
@@ -113,15 +137,22 @@ function render() {
     `<div class="kpi"><b>${dados.length}</b><span>inscrições</span></div>` +
     `<div class="kpi"><b>${pessoas}</b><span>pessoas</span></div>` +
     `<div class="kpi"><b>${brl(pago)}</b><span>recebido (${dados.filter(i => i.pago).length} pagos)</span></div>` +
-    `<div class="kpi"><b>${brl(total - pago)}</b><span>a receber (total ${brl(total)})</span></div>`;
+    `<div class="kpi"><b>${brl(total - pago)}</b><span>a receber (total ${brl(total)})</span></div>` +
+    (() => {
+      const bebem = i => (i.bebe ? 1 : 0) + i.maioresBebem;
+      const tot = dados.reduce((a, i) => a + bebem(i), 0);
+      const pg = dados.filter(i => i.pago).reduce((a, i) => a + bebem(i), 0);
+      return `<div class="kpi" style="grid-column:1/-1"><b>🍺 ${pg} de ${tot}</b><span>pagaram para beber chopp · faltam ${tot - pg} (barril: confira se o chopp dá para ${tot} bebedores)</span></div>`;
+    })();
   const q = $('#busca').value.trim().toLowerCase();
   $('#lista').innerHTML = dados.map((i, n) => ({ i, n: n + 1 }))
     .filter(x => !q || x.i.nome.toLowerCase().includes(q))
-    .map(({ i, n }) => `<div class="card"><div class="row"><div><div class="nome">${n}. ${esc(i.nome)}</div>
-      <div class="sub">${i.bebe ? '🍺 bebe chopp' : 'não bebe'} · ${acomp(i)} · ${i.pessoas} pessoa(s)</div>
-      <div class="sub">${esc(i.quando)}</div>
-      ${i.obs ? `<div class="warn">⚠ ${esc(i.obs)}</div>` : ''}</div>
-      <div class="val">${brl(i.valor)}<br><button class="${i.pago ? 'desf' : 'pagar'}" data-l="${i.linha}" data-n="${esc(i.nome)}" data-p="${i.pago ? 0 : 1}">${i.pago ? '✅ PAGO (desfazer)' : 'Marcar como PAGO'}</button><br><button class="edit" data-e="${i.linha}">✏️ Editar</button></div></div></div>`).join('')
+    .map(({ i, n }) => `<div class="it ${i.pago ? 'it-pg' : ''}" title="Inscrito em ${esc(i.quando)}">
+      <div class="it-main"><div class="it-nome"><span class="n">${n}.</span> ${esc(i.nome)}</div>
+        <div class="it-sub">${i.bebe ? '🍺' : 'sem álcool'}${acompCurto(i)}${i.obs ? ` · <span class="warn2">⚠ ${esc(i.obs)}</span>` : ''}</div></div>
+      <div class="it-val">${brl(i.valor)}</div>
+      <button class="${i.pago ? 'desf' : 'pagar'}" data-l="${i.linha}" data-n="${esc(i.nome)}" data-p="${i.pago ? 0 : 1}">${i.pago ? '✅ Pago' : 'Pagar'}</button>
+      <button class="edit" data-e="${i.linha}" title="Editar">✏️</button></div>`).join('')
     || '<p>Nenhuma inscrição.</p>';
 }
 
