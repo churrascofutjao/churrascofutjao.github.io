@@ -31,7 +31,19 @@ button{background:var(--navy);color:#fff;border:0;cursor:pointer;font-weight:600
 .it-main{flex:1;min-width:0}
 .it-nome{font-weight:700;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .it-nome .n{color:var(--muted);font-weight:600}
-.it-sub{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it-sub{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;min-height:30px}
+.it-sub .st{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chips{display:flex;gap:4px;flex:none}
+.it button.pc{width:30px;height:30px;min-width:30px;padding:0;border-radius:50%;border:2px solid var(--c);background:transparent;color:var(--fg);font-size:14px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+.it button.pc.on{background:var(--c);color:var(--t);font-weight:700}
+.pul-t{font-weight:700;margin-bottom:6px}
+.pul-row{display:flex;align-items:center;gap:8px;margin-top:6px}
+.pul-row .dot{width:18px;height:18px;border-radius:50%;background:var(--c);flex:none}
+.pul-row .pi{flex:1;min-width:0;font-size:13px;color:var(--muted);line-height:1.25}
+.pul-row .pi b{display:block;color:var(--fg);font-size:14px}
+.pul-row input{width:42%;min-width:110px;padding:7px 9px}
+button.filtro{background:transparent;color:var(--fg);border:1px solid var(--line);font-size:13px;padding:7px 10px}
+button.filtro.on{background:var(--sun);color:#1a0d03;border-color:var(--sun)}
 .warn2{color:var(--sun);font-weight:600}
 .it-val{font-weight:700;font-size:14px;white-space:nowrap}
 .it button{padding:5px 9px;font-size:13px;border-radius:7px;margin:0;white-space:nowrap}
@@ -71,7 +83,12 @@ button{background:var(--navy);color:#fff;border:0;cursor:pointer;font-weight:600
 <div id="painel" hidden>
   <div class="kpis" id="kpis"></div>
   <div class="top"><input id="busca" placeholder="Buscar nome…" style="flex:1"><button id="atualizar">Atualizar</button></div>
-  <div class="top"><button id="zap" style="flex:1;background:#1f8f4e">📋 Copiar lista para o WhatsApp</button></div>
+  <div class="top"><button id="zap" style="flex:1;background:#1f8f4e">📋 Copiar lista para o WhatsApp</button></div>  <div class="card" id="pul" style="padding:10px 12px;margin-bottom:8px">
+    <div class="pul-t" id="pul-t">🎟 Pulseiras</div>
+    <div class="pul-row"><span class="dot" id="dot-bebe"></span><div class="pi"><b id="pb-tot"></b><span id="pb-ent"></span></div><input id="cor-bebe" type="text" placeholder="Cor: quem bebe" maxlength="30" aria-label="Cor da pulseira de quem bebe"></div>
+    <div class="pul-row"><span class="dot" id="dot-nao"></span><div class="pi"><b id="pn-tot"></b><span id="pn-ent"></span></div><input id="cor-nao" type="text" placeholder="Cor: sem álcool" maxlength="30" aria-label="Cor da pulseira de quem não bebe"></div>
+    <div class="top" style="margin:8px 0 0"><button id="so-falta" class="filtro" type="button">Mostrar só quem falta entregar pulseira</button></div>
+  </div>
   <textarea id="zaptxt" rows="14" hidden readonly style="width:100%;margin-bottom:12px;font:inherit;padding:10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--fg)"></textarea>
   <div id="lista"></div>
 </div>
@@ -106,6 +123,8 @@ async function carregar() {
     const j = await (await fetch(ENDPOINT + '?admin=' + encodeURIComponent(senha))).json();
     if (!j.ok) { $('#erro').textContent = j.erro || 'Erro.'; $('#login').hidden = false; $('#painel').hidden = true; return; }
     dados = j.itens;
+    pulOk = !!j.cores;   // só a versão nova do Apps Script devolve "cores"; a antiga trataria o toque como inscrição nova
+    if (j.cores) cores = { bebe: j.cores.bebe || '', nao: j.cores.nao || '' };
     try { sessionStorage.setItem('adm', senha); } catch (e) {}
     $('#login').hidden = true; $('#painel').hidden = false; render();
   } catch (e) { $('#erro').textContent = 'Sem conexão. Tente de novo.'; }
@@ -129,7 +148,42 @@ function acompCurto(i) {
   return p.length ? ' · com ' + p.join(', ') + ' (' + i.pessoas + ' pessoas)' : '';
 }
 
+/* ---- pulseiras: quem bebe usa uma cor, quem não bebe usa outra ---- */
+let cores = { bebe: '', nao: '' }, soFalta = false, pulOk = false;
+const CORES = { azul:['#2563eb','#fff'], vermelho:['#dc2626','#fff'], verde:['#16a34a','#fff'], amarelo:['#facc15','#111'], laranja:['#f97316','#111'],
+  rosa:['#ec4899','#fff'], roxo:['#7c3aed','#fff'], preto:['#111827','#fff'], branco:['#f9fafb','#111'], cinza:['#6b7280','#fff'],
+  marrom:['#92400e','#fff'], dourado:['#d4a017','#111'], prata:['#cbd5e1','#111'], lilas:['#c084fc','#111'], bege:['#e7d3a8','#111'], turquesa:['#14b8a6','#111'], vinho:['#7f1d1d','#fff'] };
+function corCss(nome, tipo) {
+  const k = String(nome || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  for (const n in CORES) if (k.includes(n)) return CORES[n];
+  return tipo === 'bebe' ? ['#d97706', '#fff'] : ['#0ea5e9', '#fff'];
+}
+const pul = i => { const b = (i.bebe ? 1 : 0) + i.maioresBebem; return { b, n: Math.max(0, i.pessoas - b) }; };
+const entr = i => { const p = pul(i); return { b: Math.min(i.entBebe || 0, p.b), n: Math.min(i.entNao || 0, p.n) }; };
+const faltaEntregar = i => { const p = pul(i), e = entr(i); return p.b + p.n - e.b - e.n; };
+function chips(i) {
+  const p = pul(i), e = entr(i);
+  const mk = (tipo, tot, ent) => {
+    const [bg, fg] = corCss(cores[tipo], tipo), nome = tipo === 'bebe' ? 'quem bebe' : 'sem álcool', cor = cores[tipo] ? ' · ' + cores[tipo] : '';
+    return Array.from({ length: tot }, (_, k) => `<button type="button" class="pc ${k < ent ? 'on' : ''}" style="--c:${bg};--t:${fg}" data-pl="${i.linha}" data-pt="${tipo}" data-pi="${k}" aria-label="Pulseira ${nome}${esc(cor)}: ${k < ent ? 'entregue' : 'falta entregar'}">${k < ent ? '✓' : (tipo === 'bebe' ? '🍺' : '🥤')}</button>`).join('');
+  };
+  return mk('bebe', p.b, e.b) + mk('nao', p.n, e.n);
+}
+function renderPulseiras() {
+  let tb = 0, tn = 0, eb = 0, en = 0;
+  dados.forEach(i => { const p = pul(i), e = entr(i); tb += p.b; tn += p.n; eb += e.b; en += e.n; });
+  $('#pul-t').textContent = `🎟 Pulseiras: ${tb + tn} no total`;
+  $('#pb-tot').textContent = `${tb} de quem bebe`; $('#pb-ent').textContent = `entregues ${eb} · faltam ${tb - eb}`;
+  $('#pn-tot').textContent = `${tn} sem álcool`; $('#pn-ent').textContent = `entregues ${en} · faltam ${tn - en}`;
+  $('#dot-bebe').style.setProperty('--c', corCss(cores.bebe, 'bebe')[0]); $('#dot-nao').style.setProperty('--c', corCss(cores.nao, 'nao')[0]);
+  if (document.activeElement !== $('#cor-bebe')) $('#cor-bebe').value = cores.bebe;
+  if (document.activeElement !== $('#cor-nao')) $('#cor-nao').value = cores.nao;
+  $('#so-falta').classList.toggle('on', soFalta);
+  $('#so-falta').textContent = soFalta ? 'Mostrando só quem falta (toque para ver todos)' : 'Mostrar só quem falta entregar pulseira';
+}
+
 function render() {
+  renderPulseiras();
   const pessoas = dados.reduce((a, i) => a + i.pessoas, 0);
   const total = dados.reduce((a, i) => a + i.valor, 0);
   const pago = dados.filter(i => i.pago).reduce((a, i) => a + i.valor, 0);
@@ -147,9 +201,10 @@ function render() {
   const q = $('#busca').value.trim().toLowerCase();
   $('#lista').innerHTML = dados.map((i, n) => ({ i, n: n + 1 }))
     .filter(x => !q || x.i.nome.toLowerCase().includes(q))
+    .filter(x => !soFalta || faltaEntregar(x.i) > 0)
     .map(({ i, n }) => `<div class="it ${i.pago ? 'it-pg' : ''}" title="Inscrito em ${esc(i.quando)}">
       <div class="it-main"><div class="it-nome"><span class="n">${n}.</span> ${esc(i.nome)}</div>
-        <div class="it-sub">${i.bebe ? '🍺' : 'sem álcool'}${acompCurto(i)}${i.obs ? ` · <span class="warn2">⚠ ${esc(i.obs)}</span>` : ''}</div></div>
+        <div class="it-sub"><span class="st">${acompCurto(i).replace(/^ · /, '')}${i.obs ? `${acompCurto(i) ? ' · ' : ''}<span class="warn2">⚠ ${esc(i.obs)}</span>` : ''}</span><span class="chips">${chips(i)}</span></div></div>
       <div class="it-val">${brl(i.valor)}</div>
       <button class="${i.pago ? 'desf' : 'pagar'}" data-l="${i.linha}" data-n="${esc(i.nome)}" data-p="${i.pago ? 0 : 1}">${i.pago ? '✅ Pago' : 'Pagar'}</button>
       <button class="edit" data-e="${i.linha}" title="Editar">✏️</button></div>`).join('')
@@ -238,6 +293,32 @@ $('#entrar').onclick = () => { senha = $('#senha').value; carregar(); };
 $('#senha').addEventListener('keydown', e => { if (e.key === 'Enter') $('#entrar').click(); });
 $('#atualizar').onclick = carregar;
 $('#busca').oninput = render;
+$('#so-falta').onclick = () => { soFalta = !soFalta; render(); };
+$('#lista').addEventListener('click', async e => {
+  const c = e.target.closest('button[data-pl]'); if (!c) return;
+  if (!pulOk) { alert('As pulseiras ainda não estão ativas no servidor. Atualize o Apps Script (Nova versão) e recarregue a página.'); return; }
+  const it = dados.find(x => String(x.linha) === c.dataset.pl); if (!it) return;
+  const tipo = c.dataset.pt, k = Number(c.dataset.pi), campo = tipo === 'bebe' ? 'entBebe' : 'entNao';
+  const atual = tipo === 'bebe' ? entr(it).b : entr(it).n, novo = k < atual ? k : k + 1;
+  it[campo] = novo; render();
+  try {
+    const j = await (await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ admin: senha, pulseiraLinha: it.linha, nome: it.nome, tipo, entregues: novo }) })).json();
+    if (!j.ok) throw new Error(j.erro || 'Erro');
+  } catch (x) { alert('Não consegui salvar a pulseira: ' + x.message); carregar(); }
+});
+['bebe', 'nao'].forEach(t => {
+  const el = $('#cor-' + t);
+  el.addEventListener('input', () => { cores[t] = el.value.trim(); renderPulseiras(); render(); });
+  el.addEventListener('change', async () => {
+    if (!pulOk) return;
+    try {
+      const j = await (await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ admin: senha, cores }) })).json();
+      if (!j.ok) throw new Error(j.erro || 'Erro');
+    } catch (x) { alert('Não consegui salvar a cor: ' + x.message); }
+  });
+});
 if (senha) carregar();
 </script>
 </body>
