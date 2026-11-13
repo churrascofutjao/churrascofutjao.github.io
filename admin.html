@@ -83,7 +83,7 @@ button.filtro.on{background:var(--sun);color:#1a0d03;border-color:var(--sun)}
 <div id="painel" hidden>
   <div class="kpis" id="kpis"></div>
   <div class="top"><input id="busca" placeholder="Buscar nome…" style="flex:1"><button id="atualizar">Atualizar</button></div>
-  <div class="top"><button id="zap" style="flex:1;background:#1f8f4e">📋 Copiar lista para o WhatsApp</button></div>  <div class="card" id="pul" style="padding:10px 12px;margin-bottom:8px">
+  <div class="top"><button id="zap" style="flex:1;background:#1f8f4e">📋 Copiar lista para o WhatsApp</button><button id="nova" type="button">➕ Nova inscrição</button></div>  <div class="card" id="pul" style="padding:10px 12px;margin-bottom:8px">
     <div class="pul-t" id="pul-t">🎟 Pulseiras</div>
     <div class="pul-row"><span class="dot" id="dot-bebe"></span><div class="pi"><b id="pb-tot"></b><span id="pb-ent"></span></div><input id="cor-bebe" type="text" placeholder="Cor: quem bebe" maxlength="30" aria-label="Cor da pulseira de quem bebe"></div>
     <div class="pul-row"><span class="dot" id="dot-nao"></span><div class="pi"><b id="pn-tot"></b><span id="pn-ent"></span></div><input id="cor-nao" type="text" placeholder="Cor: sem álcool" maxlength="30" aria-label="Cor da pulseira de quem não bebe"></div>
@@ -103,6 +103,7 @@ button.filtro.on{background:var(--sun);color:#1a0d03;border-color:var(--sun)}
   <label for="m-mn">Filhos 18+ que não bebem (R$ 50 cada)</label><input id="m-mn" type="number" min="0" max="10">
   <label for="m-valor">Valor a pagar (R$)</label><input id="m-valor" type="number" min="0" step="1">
   <div id="mauto"></div>
+  <label class="chk" id="m-pagolbl" hidden><input id="m-pago" type="checkbox"> Já pagou</label>
   <label for="m-obs">Observação</label><input id="m-obs" type="text">
   <div id="merro" style="color:var(--bad);margin-top:8px"></div>
   <div class="acoes"><button id="m-salvar">Salvar</button><button id="m-cancelar" class="cinza">Cancelar</button></div>
@@ -238,6 +239,7 @@ function atualizaAuto() {
 $('#lista').addEventListener('click', e => {
   const b = e.target.closest('button[data-e]'); if (!b) return;
   EDIT = dados.find(x => String(x.linha) === b.dataset.e); if (!EDIT) return;
+  $('#m-pagolbl').hidden = true; $('#m-remover').parentNode.hidden = false;
   $('#m-nome').value = EDIT.nome; $('#m-bebe').checked = EDIT.bebe; $('#m-esposa').checked = EDIT.esposa;
   $('#m-men').value = EDIT.menores; $('#m-mb').value = EDIT.maioresBebem; $('#m-mn').value = EDIT.maioresNao;
   $('#m-obs').value = EDIT.obs || ''; $('#m-valor').value = EDIT.valor; $('#merro').textContent = '';
@@ -251,10 +253,17 @@ async function enviarAdmin(corpo) {
     body: JSON.stringify({ admin: senha, nome: EDIT.nome, ...corpo }) })).json();
   if (!j.ok) throw new Error(j.erro || 'Erro ao salvar.');
 }
+$('#nova').onclick = () => {
+  EDIT = { novo: true, linha: 0, nome: '' };
+  $('#m-nome').value = ''; $('#m-bebe').checked = true; $('#m-esposa').checked = false;
+  $('#m-men').value = 0; $('#m-mb').value = 0; $('#m-mn').value = 0; $('#m-obs').value = ''; $('#m-pago').checked = true;
+  $('#merro').textContent = ''; $('#m-pagolbl').hidden = false; $('#m-remover').parentNode.hidden = true;
+  valorManual = false; atualizaAuto(); $('#modal').hidden = false;
+};
 $('#m-salvar').onclick = async () => {
   if (!EDIT) return; const b = $('#m-salvar'); b.disabled = true; b.textContent = 'Salvando…';
   try {
-    await enviarAdmin({ editarLinha: EDIT.linha, novoNome: $('#m-nome').value, bebe: $('#m-bebe').checked, esposa: $('#m-esposa').checked,
+    await enviarAdmin({ [EDIT.novo ? 'adicionar' : 'editarLinha']: EDIT.novo ? true : EDIT.linha, pago: $('#m-pago').checked, novoNome: $('#m-nome').value, bebe: $('#m-bebe').checked, esposa: $('#m-esposa').checked,
       menores: n0($('#m-men').value), maioresBebem: n0($('#m-mb').value), maioresNao: n0($('#m-mn').value),
       valor: Number($('#m-valor').value), obs: $('#m-obs').value });
     $('#modal').hidden = true; EDIT = null; carregar();
